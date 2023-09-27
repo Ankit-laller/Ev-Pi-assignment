@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:ankit_assignment/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -35,6 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool isScrollUp = false;
   final panelController= PanelController();
+  double _sliderValue =1;
 
 
   @override
@@ -69,15 +72,36 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             SlidingUpPanel(
               controller: panelController,
+              onPanelSlide: (double value){
+
+                setState(() {
+                  _sliderValue +0.1;
+
+                });
+
+              },
               body: Stack(
                 children: [
+                  TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 200),
+                      tween: Tween<double>(begin: 0.01, end: 1),
 
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: Image.asset("assets/home.jpg",
-                      fit: BoxFit.cover,
-                    ),
+
+                    builder: (BuildContext context, double? value, Widget? child) {
+                      return BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 40 * (_sliderValue ?? 0.01),
+                          sigmaY: 40 * (_sliderValue ?? 0.01),
+                        ),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.asset("assets/home.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    }
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 12.0, bottom: 180),
@@ -135,10 +159,14 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(12.0),
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: isScrollUp? const ButtonExpandedWidget(): FloatingActionButton(
-                  backgroundColor: Colors.blueAccent[100],
-                  onPressed: (){},
-                  child: Icon(Icons.flight_takeoff_rounded, size: 40,),),
+                child: isScrollUp? const ButtonExpandedWidget(): AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.linear,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.blueAccent[100],
+                    onPressed: (){},
+                    child: Icon(Icons.flight_takeoff_rounded, size: 40,),),
+                ),
               ),
             ),
 
